@@ -247,7 +247,7 @@ int drakvuf_is_interrupted(drakvuf_t drakvuf)
     return drakvuf->interrupted;
 }
 
-bool inject_trap_breakpoint(drakvuf_t drakvuf, drakvuf_trap_t* trap)
+bool inject_trap_sw(drakvuf_t drakvuf, drakvuf_trap_t* trap)
 {
 
     if (trap->breakpoint.lookup_type == LOOKUP_NONE)
@@ -394,7 +394,7 @@ bool drakvuf_add_trap(drakvuf_t drakvuf, drakvuf_trap_t* trap)
     switch (trap->type)
     {
         case BREAKPOINT:
-            ret = inject_trap_breakpoint(drakvuf, trap);
+            ret = inject_trap_sw(drakvuf, trap);
             break;
         case MEMACCESS:
             ret = inject_trap_mem(drakvuf, trap, 0);
