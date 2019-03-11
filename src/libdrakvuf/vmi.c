@@ -127,7 +127,7 @@
 
 static uint32_t sw_trap = SW_TRAP;
 
-status_t vmi_read_sw_trap(vmi_instance_t vmi, addr_t pa, uint32_t* value)
+static status_t vmi_read_sw_trap(vmi_instance_t vmi, addr_t pa, uint32_t* value)
 {
 #if defined(I386) || defined(X86_64)
     return vmi_read_8_pa(vmi, pa, (uint8_t*)value);
@@ -136,7 +136,7 @@ status_t vmi_read_sw_trap(vmi_instance_t vmi, addr_t pa, uint32_t* value)
 #endif
 }
 
-status_t vmi_write_sw_trap(vmi_instance_t vmi, addr_t pa, uint32_t* value)
+static status_t vmi_write_sw_trap(vmi_instance_t vmi, addr_t pa, uint32_t* value)
 {
 #if defined(I386) || defined(X86_64)
     return vmi_write_8_pa(vmi, pa, (uint8_t*)value);
@@ -495,12 +495,12 @@ event_response_t smc_cb(vmi_instance_t vmi, vmi_event_t* event)
 {
     UNUSED(vmi);
     event_response_t rsp = 0;
-    drakvuf_t drakvuf = event->data;
+    drakvuf_t drakvuf = (drakvuf_t)event->data;
     drakvuf->arm_regs[event->vcpu_id] = event->arm_regs;
 
     addr_t pa = (event->privcall_event.gfn << 12) + event->privcall_event.offset;
 
-    struct wrapper* s = g_hash_table_lookup(drakvuf->breakpoint_lookup_pa, &pa);
+    struct wrapper* s = (struct wrapper*)g_hash_table_lookup(drakvuf->breakpoint_lookup_pa, &pa);
     if (!s)
     {
         if ( event->slat_id == drakvuf->altp2m_ids )
@@ -540,7 +540,7 @@ event_response_t smc_cb(vmi_instance_t vmi, vmi_event_t* event)
     GSList* loop = s->traps;
     while (loop)
     {
-        drakvuf_trap_t* trap = loop->data;
+        drakvuf_trap_t* trap = (drakvuf_trap_t*)loop->data;
         drakvuf_trap_info_t trap_info =
         {
             .trap = trap,
@@ -1639,7 +1639,7 @@ bool init_vmi(drakvuf_t drakvuf, bool libvmi_conf)
      * the shadow pages from the first execute view have been executed.
      */
 #if defined(ARM64)
-    rc = xc_altp2m_create_view( drakvuf->xen->xc, drakvuf->domID, 0, &drakvuf->altp2m_ids );
+    rc = xc_altp2m_create_view( drakvuf->xen->xc, drakvuf->domID, (xenmem_access_t)0, &drakvuf->altp2m_ids );
     PRINT_DEBUG("Altp2m step view created? %i with ID %u\n", rc, drakvuf->altp2m_ids);
     if (rc < 0)
         return 0;

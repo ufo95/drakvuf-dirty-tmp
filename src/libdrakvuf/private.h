@@ -319,7 +319,7 @@ char* drakvuf_get_current_process_name(drakvuf_t drakvuf,
 int64_t drakvuf_get_current_process_userid(drakvuf_t drakvuf,
         uint64_t vcpu_id);
 
-bool inject_trap_breakpoint(drakvuf_t drakvuf, drakvuf_trap_t* trap);
+bool inject_trap_sw(drakvuf_t drakvuf, drakvuf_trap_t* trap);
 bool inject_trap_reg(drakvuf_t drakvuf, drakvuf_trap_t* trap);
 bool inject_trap_debug(drakvuf_t drakvuf, drakvuf_trap_t* trap);
 bool inject_trap_cpuid(drakvuf_t drakvuf, drakvuf_trap_t* trap);
@@ -330,5 +330,6 @@ event_response_t int3_cb(vmi_instance_t vmi, vmi_event_t* event);
 event_response_t cr3_cb(vmi_instance_t vmi, vmi_event_t* event);
 event_response_t debug_cb(vmi_instance_t vmi, vmi_event_t* event);
 event_response_t cpuid_cb(vmi_instance_t vmi, vmi_event_t* event);
+event_response_t smc_cb(vmi_instance_t vmi, vmi_event_t* event);
 
 #endif

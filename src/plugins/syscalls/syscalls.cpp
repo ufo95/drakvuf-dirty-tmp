@@ -110,6 +110,7 @@
 #include "winscproto.h"
 #include "linuxscproto.h"
 
+#if 0
 static event_response_t linux_cb(drakvuf_t drakvuf, drakvuf_trap_info_t* info)
 {
 
@@ -146,6 +147,7 @@ static event_response_t linux_cb(drakvuf_t drakvuf, drakvuf_trap_info_t* info)
 
     return 0;
 }
+#endif
 
 static char* extract_string(drakvuf_t drakvuf, drakvuf_trap_info_t* info, const arg_t& arg, addr_t val)
 {
@@ -221,10 +223,18 @@ static void print_header(output_format_t format, drakvuf_t drakvuf, const drakvu
 
         case OUTPUT_DEFAULT:
         default:
+#if defined (I386) || defined (X86_64)
             printf("[SYSCALL] TIME:" FORMAT_TIMEVAL " VCPU:%" PRIu32 " CR3:0x%" PRIx64 ",\"%s\" %s:%" PRIi64" %s!%s",
                    UNPACK_TIMEVAL(info->timestamp), info->vcpu, info->regs->cr3, info->proc_data.name,
                    USERIDSTR(drakvuf), info->proc_data.userid,
                    info->trap->breakpoint.module, info->trap->name);
+#elif defined (ARM64)
+            printf("[SYSCALL] vCPU:%" PRIu32 " PC:%" PRIx64 " CPSR:%" PRIx32 " TTBR0:0x%" PRIx64 " TTBR1:0x%" PRIx64 ", %s: %s!%s\n",
+                   info->vcpu, info->arm_regs->pc, info->arm_regs->cpsr,
+                   info->arm_regs->ttbr0, info->arm_regs->ttbr1,
+                   USERIDSTR(drakvuf),
+                   info->trap->breakpoint.module, info->trap->name);
+#endif
             break;
     }
 }
