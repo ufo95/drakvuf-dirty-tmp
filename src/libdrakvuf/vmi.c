@@ -493,6 +493,7 @@ event_response_t pre_mem_cb(vmi_instance_t vmi, vmi_event_t* event)
 
 event_response_t smc_cb(vmi_instance_t vmi, vmi_event_t* event)
 {
+    PRINT_DEBUG("smc_cb\n");
     UNUSED(vmi);
     event_response_t rsp = 0;
     drakvuf_t drakvuf = (drakvuf_t)event->data;
@@ -503,8 +504,10 @@ event_response_t smc_cb(vmi_instance_t vmi, vmi_event_t* event)
     struct wrapper* s = (struct wrapper*)g_hash_table_lookup(drakvuf->breakpoint_lookup_pa, &pa);
     if (!s)
     {
+        PRINT_DEBUG("Before SIMULATED SS slat_id: %i\n", event->slat_id);
         if ( event->slat_id == drakvuf->altp2m_ids )
         {
+            PRINT_DEBUG("SIMULATED SS\n");
             /*
              * We are right now in the 'simulated' single step. We look
              * for the original trap, thats why we want decrease the pa by 4.
@@ -556,11 +559,15 @@ event_response_t smc_cb(vmi_instance_t vmi, vmi_event_t* event)
 
     process_free_requests(drakvuf);
     // Check if we have traps still active on this breakpoint
+
     if ( g_hash_table_lookup(drakvuf->breakpoint_lookup_pa, &pa) )
     {
         PRINT_DEBUG("Switching altp2m and to singlestep on vcpu %u - %i SMC executed\n", event->vcpu_id, event->slat_id);
-        if ( event->slat_id == drakvuf->altp2m_idx )
+        PRINT_DEBUG("Switching altp2m from idx:%u to ids: %i idr: %i \n", drakvuf->altp2m_idx, drakvuf->altp2m_ids, drakvuf->altp2m_idr);
+        if ( event->slat_id == drakvuf->altp2m_idx ) {
+	    PRINT_DEBUG("actually switching!\n");
             event->slat_id = drakvuf->altp2m_ids;
+	}
 
         return rsp |
                VMI_EVENT_RESPONSE_VMM_PAGETABLE_ID;

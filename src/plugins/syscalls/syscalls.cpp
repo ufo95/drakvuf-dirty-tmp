@@ -110,7 +110,6 @@
 #include "winscproto.h"
 #include "linuxscproto.h"
 
-#if 0
 static event_response_t linux_cb(drakvuf_t drakvuf, drakvuf_trap_info_t* info)
 {
 
@@ -147,7 +146,6 @@ static event_response_t linux_cb(drakvuf_t drakvuf, drakvuf_trap_info_t* info)
 
     return 0;
 }
-#endif
 
 static char* extract_string(drakvuf_t drakvuf, drakvuf_trap_info_t* info, const arg_t& arg, addr_t val)
 {
@@ -382,6 +380,7 @@ static void print_footer(output_format_t format, uint32_t nargs)
     }
 }
 
+#if 0
 static event_response_t linux_cb(drakvuf_t drakvuf, drakvuf_trap_info_t* info)
 {
     unsigned int nargs = 0;
@@ -457,6 +456,7 @@ static event_response_t linux_cb(drakvuf_t drakvuf, drakvuf_trap_info_t* info)
     drakvuf_release_vmi(drakvuf);
     return 0;
 }
+#endif
 
 static event_response_t win_cb(drakvuf_t drakvuf, drakvuf_trap_info_t* info)
 {
@@ -624,6 +624,7 @@ static GSList* create_trap_config(drakvuf_t drakvuf, syscalls* s, symbols_t* sym
                         !strcmp(symbol->name,  "sys_tracepoint_refcount") ||
                         !strcmp(symbol->name,  "sys_table")               ||
                         !strcmp(symbol->name,  "sys_perf_refcount_enter") ||
+                        !strcmp(symbol->name,  "sys_clock_gettime") ||
                         !strcmp(symbol->name,  "sys_perf_refcount_exit")   )
                     continue;
             }
